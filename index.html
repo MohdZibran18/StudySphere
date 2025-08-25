@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySphere</title>
+    <style>
+      
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6; 
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevent overall scrollbar */
+        }
+
+        /* Custom Scrollbar for Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 256px; /* w-64 */
+            background-color: #1f2937; /* gray-800 */
+            color: #ffffff; /* text-white */
+            display: flex;
+            flex-direction: column;
+            border-top-right-radius: 0.5rem; /* rounded-r-lg */
+            border-bottom-right-radius: 0.5rem; /* rounded-r-lg */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow-y: auto; /* overflow-y-auto */
+        }
+
+        .sidebar-header {
+            padding: 1.5rem; /* p-6 */
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: bold;
+            border-bottom: 1px solid #374151; /* border-b border-gray-700 */
+        }
+
+        .sidebar-nav {
+            flex: 1; /* flex-1 */
+            padding: 1rem; /* p-4 */
+            space-y: 0.5rem; /* space-y-2 */
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem; /* p-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            text-decoration: none;
+            color: #d1d5db; /* text-gray-300 */
+            transition: background-color 0.2s ease-in-out; /* transition duration-200 */
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #374151; /* hover:bg-gray-700 */
+        }
+
+        .sidebar-nav .dashboard-link {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: #ffffff; /* text-white */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+
+        .sidebar-nav .dashboard-link:hover {
+            background-color: #1d4ed8; /* hover:bg-blue-700 */
+        }
+
+        .sidebar-nav svg {
+            width: 1.25rem; /* w-5 */
+            height: 1.25rem; /* h-5 */
+            margin-right: 0.75rem; /* mr-3 */
+        }
+
+        .sidebar-nav .category-title {
+            padding: 0.75rem; /* p-3 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            color: #9ca3af; /* text-gray-400 */
+            text-transform: uppercase; /* uppercase */
+            letter-spacing: 0.05em; /* tracking-wider */
+            margin-top: 1rem; /* mt-4 */
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav ul ul {
+            margin-left: 1.5rem; /* ml-6 */
+            margin-top: 0.25rem; /* mt-1 */
+            space-y: 0.25rem; /* space-y-1 */
+        }
+
+        .sidebar-nav ul ul a {
+            padding: 0.5rem; /* p-2 */
+            color: #9ca3af; /* text-gray-400 */
+        }
+
+        /* Main Content Area Styles */
+        .main-content {
+            flex: 1; /* flex-1 */
+            display: flex;
+            flex-direction: column;
+            background-color: #f9fafb; /* gray-100 */
+            overflow-y: auto; /* Allow main content to scroll */
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #ffffff; /* bg-white */
+            padding: 1rem 1.5rem; /* p-4 px-6 */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb; /* border-b border-gray-200 */
+        }
+
+        .header-search-bar {
+            flex: 1; /* flex-1 */
+            max-width: 500px; /* max-w-xl */
+            margin: 0 1rem; /* mx-4 */
+            position: relative;
+        }
+
+        .header-search-bar input {
+            width: 100%; /* w-full */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            padding-left: 2.5rem; /* pl-10 for icon */
+            border: 1px solid #d1d5db; /* border border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 1rem; /* text-base */
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .header-search-bar input:focus {
+            border-color: #2563eb; /* focus:border-blue-600 */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* focus:ring focus:ring-blue-200 */
+        }
+
+        .header-search-bar svg {
+            position: absolute;
+            left: 0.75rem; /* left-3 */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.25rem; /* w-5 */
+            height: 1.25rem; /* h-5 */
+            color: #6b7280; /* text-gray-500 */
+        }
+
+        .header-upload-button {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: #ffffff; /* text-white */
+            padding: 0.75rem 1.25rem; /* py-3 px-5 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+
+        .header-upload-button:hover {
+            background-color: #1d4ed8; /* hover:bg-blue-700 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* hover:shadow-lg */
+        }
+
+        /* Dashboard Content Styles */
+        .dashboard-content {
+            padding: 1.5rem; /* p-6 */
+            flex: 1; /* flex-1 */
+        }
+
+        .breadcrumb {
+            color: #6b7280; /* text-gray-500 */
+            font-size: 0.875rem; /* text-sm */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+
+        .breadcrumb span {
+            color: #374151; /* text-gray-700 */
+            font-weight: 600; /* font-semibold */
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 */
+            gap: 1.5rem; /* gap-6 */
+            margin-bottom: 2rem; /* mb-8 */
+        }
+
+        .stat-card {
+            background-color: #ffffff; /* bg-white */
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stat-card .value {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: bold;
+            color: #111827; /* text-gray-900 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        .stat-card .label {
+            font-size: 1rem; /* text-base */
+            color: #4b5563; /* text-gray-700 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        .stat-card .icon-placeholder {
+            width: 3rem; /* w-12 */
+            height: 3rem; /* h-12 */
+            background-color: #bfdbfe; /* blue-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            margin-top: 1rem; /* mt-4 */
+        }
+
+        /* Previous Year Papers Section */
+        .papers-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+
+        .papers-section-header h2 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            color: #111827; /* text-gray-900 */
+        }
+
+        .filter-dropdowns {
+            display: flex;
+            gap: 0.75rem; /* gap-3 */
+        }
+
+        .filter-dropdowns select {
+            padding: 0.625rem 1rem; /* py-2.5 px-4 */
+            border: 1px solid #d1d5db; /* border border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #ffffff; /* bg-white */
+            font-size: 0.875rem; /* text-sm */
+            color: #374151; /* text-gray-700 */
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .filter-dropdowns select:focus {
+            border-color: #2563eb; /* focus:border-blue-600 */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* focus:ring focus:ring-blue-200 */
+        }
+
+        .no-papers-message {
+            background-color: #ffffff; /* bg-white */
+            padding: 4rem 2rem; /* py-16 px-8 */
+            text-align: center;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            color: #4b5563; /* text-gray-700 */
+        }
+
+        .no-papers-message .icon-circle {
+            width: 4rem; /* w-16 */
+            height: 4rem; /* h-16 */
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 9999px; /* rounded-full */
+            margin: 0 auto 1.5rem; /* mx-auto mb-6 */
+        }
+
+        .no-papers-message p {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        .no-papers-message small {
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* text-gray-500 */
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto; /* Allow scrolling on small screens */
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .main-content {
+                overflow-y: visible; /* Allow main content to scroll on small screens */
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .header-search-bar {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+            }
+            .header-upload-button {
+                width: 100%;
+                text-align: center;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr; /* Stack cards on small screens */
+            }
+            .filter-dropdowns {
+                flex-direction: column;
+                width: 100%;
+            }
+            .filter-dropdowns select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            StudySphere
+        </div>
+        <nav class="sidebar-nav">
+            <!-- Dashboard Link -->
+            <a href="#" class="dashboard-link">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Dashboard
+            </a>
+
+            <div class="category-title">Courses</div>
+            <ul>
+                <li>
+                    <a href="#">B.Tech</a>
+                    <ul>
+                        <li><a href="#">Computer Science</a></li>
+                        <li><a href="#">Civil</a></li>
+                        <li><a href="#">Electronics</a></li>
+                        <li><a href="#">Mechanical</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">M.Tech</a>
+                    <ul>
+                        <li><a href="#">Computer Science</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">MBA</a>
+                    <ul>
+                        <li><a href="#">MBA</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="category-title">Content</div>
+            <ul>
+                <li><a href="#">Previous Papers</a></li>
+                <li><a href="#">Question Banks</a></li>
+                <li><a href="#">Syllabus</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="text-2xl font-bold text-gray-800">AcademicVault</div> <!-- Added for consistency, can be removed if redundant -->
+            <div class="header-search-bar">
+                <input type="text" placeholder="Search papers, courses, subjects...">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <a href="#" class="header-upload-button">Upload</a>
+        </header>
+
+        <!-- Dashboard Content -->
+        <section class="dashboard-content">
+            <div class="breadcrumb">Home / <span>Dashboard</span></div>
+
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value">0</div>
+                    <div class="label">Total Papers</div>
+                    <div class="icon-placeholder"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">0</div>
+                    <div class="label">Question Banks</div>
+                    <div class="icon-placeholder"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">6</div>
+                    <div class="label">Courses</div>
+                    <div class="icon-placeholder"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">0</div>
+                    <div class="label">Downloads</div>
+                    <div class="icon-placeholder"></div>
+                </div>
+            </div>
+
+            <!-- Previous Year Papers Section -->
+            <div class="papers-section">
+                <div class="papers-section-header">
+                    <h2>Previous Year Papers</h2>
+                    <div class="filter-dropdowns">
+                        <select>
+                            <option>All Years</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                            <option>2022</option>
+                        </select>
+                        <select>
+                            <option>All Subjects</option>
+                            <option>Computer Science</option>
+                            <option>Civil</option>
+                            <option>Electronics</option>
+                            <option>Mechanical</option>
+                        </select>
+                        <select>
+                            <option>All Types</option>
+                            <option>Previous Papers</option>
+                            <option>Question Banks</option>
+                            <option>Syllabus</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- No Papers Found Message -->
+                <div class="no-papers-message">
+                    <div class="icon-circle"></div>
+                    <p>No papers found</p>
+                    <small>Try adjusting your search or filters to find what you're looking for.</small>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
